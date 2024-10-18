@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur de Roulette - Stratégie Fibonacci</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input {
+            margin-bottom: 10px;
+        }
+        button {
+            margin: 10px 0;
+            padding: 10px 20px;
+        }
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simulateur de Roulette - Stratégie Fibonacci</h1>
+    <form id="simulationForm">
+        <label for="miseInitiale">Mise initiale (CFA) :</label>
+        <input type="number" id="miseInitiale" value="100"><br>
+
+        <label for="capital">Capital de départ (CFA) :</label>
+        <input type="number" id="capital" value="5300"><br>
+
+        <label for="objectif">Objectif de gain (CFA) :</label>
+        <input type="number" id="objectif" value="2000"><br>
+
+        <label for="tourVerif">Nombre de tours sans sortie :</label>
+        <input type="number" id="tourVerif" value="5"><br>
+
+        <button type="button" onclick="simuler()">Lancer la simulation</button>
+    </form>
+
+    <div class="result" id="resultat"></div>
+
+    <script>
+        // Suite de Fibonacci
+        function fibonacci(n) {
+            return (n <= 1) ? n : fibonacci(n - 1) + fibonacci(n - 2);
+        }
+
+        function simuler() {
+            // Récupérer les valeurs des champs
+            let miseInitiale = parseInt(document.getElementById('miseInitiale').value);
+            let capital = parseInt(document.getElementById('capital').value);
+            let objectif = parseInt(document.getElementById('objectif').value);
+            let tourVerif = parseInt(document.getElementById('tourVerif').value);
+
+            let capitalDepart = capital;
+            let gains = 0;
+            let pertes = 0;
+            let toursSansSortie = 0;
+            let sequence = [1, 1]; // Suite Fibonacci de départ
+            let miseActuelle = miseInitiale;
+
+            let resultat = "Simulation en cours...<br>";
+
+            // Simulation des tours
+            while (gains < objectif && capital > 0) {
+                // Vérifier si la douzaine/ligne n'est pas sortie dans les derniers tours
+                if (toursSansSortie >= tourVerif) {
+                    // Calcul de la mise selon la suite de Fibonacci
+                    let fibonacciMise = miseInitiale * fibonacci(sequence.length - 1);
+                    resultat += Mise actuelle (Fibonacci): ${fibonacciMise} CFA<br>;
+                    
+                    // Simuler un tour de roulette (gagner = 1/3 de chance)
+                    let gain = Math.random() < 0.333;
+
+                    if (gain) {
+                        let gainMontant = fibonacciMise * 2; // Douzaine ou ligne paie 2 fois
+                        capital += gainMontant;
+                        gains += gainMontant;
+                        resultat += Gagné ${gainMontant} CFA! Nouveau capital: ${capital} CFA<br>;
+                        sequence.splice(-2, 2); // Retour de deux positions dans la séquence
+                        toursSansSortie = 0; // Réinitialiser le compteur
+                    } else {
+                        capital -= fibonacciMise;
+                        pertes += fibonacciMise;
+                        resultat += Perdu ${fibonacciMise} CFA. Nouveau capital: ${capital} CFA<br>;
+                        sequence.push(fibonacci(sequence.length)); // Prochaine position Fibonacci
+                        toursSansSortie++; // Incrémenter les tours sans sortie
+                    }
+                } else {
+                    resultat += La douzaine/ligne a été touchée récemment. Attente...<br>;
+                    toursSansSortie++;
+                }
+
+                // Vérifier si le capital est épuisé
+                if (capital <= 0) {
+                    resultat += "Capital épuisé, fin de la simulation.<br>";
+                    break;
+                }
+
+                // Si on atteint l'objectif
+                if (gains >= objectif) {
+                    resultat += Objectif de ${objectif} CFA atteint!<br>;
+                    break;
+                }
+            }
+
+            // Afficher le résultat de la simulation
+            resultat += Résultat final: Capital: ${capital} CFA, Gains: ${gains} CFA, Pertes: ${pertes} CFA<br>;
+            document.getElementById('resultat').innerHTML = resultat;
+        }
+    </script>
+</body>
+</html>
